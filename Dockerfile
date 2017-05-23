@@ -1,29 +1,25 @@
-FROM ubuntu:10.04
+FROM ubuntu:17.04
 
-MAINTAINER Ilias Kiourktsidis "ekiourk@gmail.com"
+# Old Mantainer: Ilias Kiourktsidis "ekiourk@gmail.com"
+MAINTAINER Leonardo Amaral "git@leonardoamaral.com.br"
 
-RUN apt-get update && apt-get install -y\
-  build-essential\
-  autoconf\
-  automake\
-  libxmu-dev\
-  curl\
-  gcc-4.3
+RUN sed -i -e "s,archive.ubuntu.com,br.archive.ubuntu.com,g" /etc/apt/sources.list && \
+ apt-get update && apt-get -y install apt-utils && \
+ apt install -y curl zlib1g-dev libpng-dev libpng16-16 libjpeg9-dev libjpeg9 libgpac-dev libgpac4 gpac build-essential ns2 ns2-doc ns2-examples nam xgraph sgb cwebx && \
+ rm -rf /var/lib/apt/lists/*
 
-RUN curl -L http://downloads.sourceforge.net/project/nsnam/allinone/ns-allinone-2.35/ns-allinone-2.35.tar.gz | tar xz
+# Evalvid building
 
-RUN mv ns-allinone-2.35 ns2
+RUN mkdir -p /tmp/evalvid-build
+WORKDIR /tmp/evalvid-build
+ADD evalvid.diff evalvid.diff
+RUN curl http://www2.tkn.tu-berlin.de/research/evalvid/EvalVid/evalvid-2.7.tar.bz2 | tar -xj 
+RUN patch -p1 < evalvid.diff
+RUN make install
+WORKDIR /tmp
+RUN rm -rf evalvid-build
 
-WORKDIR ns2
+# Cleanup
+RUN apt -y purge build-essential libgpac-dev zlib1g-dev libjpeg9-dev libpng-dev
 
-ADD patch.diff /ns2/patch.diff
-
-RUN patch -p1 < patch.diff
-
-RUN ./install
-
-ENV PATH $PATH:/ns2/bin:/ns2/tcl8.5.10/unix:/ns2/tk8.5.10/unix
-ENV LD_LIBRARY_PATH /ns2/otcl-1.14:/ns2/lib
-ENV TCL_LIBRARY /ns2/tcl8.5.10/library
-
-WORKDIR ns-2.35
+WORKDIR /tmp

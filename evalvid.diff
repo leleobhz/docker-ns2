@@ -1,0 +1,40 @@
+--- a/types.h
++++ b/types.h
+@@ -6,8 +6,9 @@
+   typedef unsigned __int64 u64;
+   typedef SOCKET sock_t;
+ #elif defined(__linux__)
++  #include <stdint.h>
+   typedef int sock_t;
+-  typedef unsigned long long u64;
++  typedef uint64_t u64;
+ #else
+   #include <stdint.h>
+   typedef int sock_t;
+
+--- a/Makefile
++++ b/Makefile
+@@ -10,11 +10,11 @@
+ 
+ mp4trace: bits.o error.o lock.o misc.o queue.o socket.o thread.o timing.o mp4trace.o
+        @echo L $@ ...
+-       @$(CC) $^ -o $@ -lpthread -lgpac_static 
++       @$(CC) $^ -o $@ -lgpac_static -lm -lz -lpng -ljpeg -lpthread
+ 
+ etmp4: bits.o misc.o read.o stat.o writemp4.o etmp4.o
+        @echo L $@ ...
+-       @$(CC) $^ -o $@ -lgpac_static -lm
++       @$(CC) $^ -o $@ -lgpac_static -lm -lz -lpng -ljpeg -lpthread
+ 
+ psnr: psnr.o
+        @echo L $@ ...
+@@ -38,7 +38,7 @@
+ 
+ vsgen: vsgen.o
+        @echo L $@ ...
+-       @$(CC) $^ -o $@
++       @$(CC) $^ -lm -o $@
+ 
+ %.o: %.c
+        @echo C $< ...
+
