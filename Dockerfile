@@ -5,8 +5,7 @@ MAINTAINER Leonardo Amaral "git@leonardoamaral.com.br"
 
 RUN sed -i -e "s,archive.ubuntu.com,br.archive.ubuntu.com,g" /etc/apt/sources.list && \
  apt-get update && apt-get -y install apt-utils && \
- apt install -y curl zlib1g-dev libpng-dev libpng16-16 libjpeg9-dev libjpeg9 libgpac-dev libgpac4 gpac build-essential ns2 ns2-doc ns2-examples nam xgraph sgb cwebx && \
- rm -rf /var/lib/apt/lists/*
+ apt install -y curl zlib1g-dev libpng-dev libpng16-16 libjpeg9-dev libjpeg9 libgpac-dev libgpac4 gpac gcc ns2 nam patch
 
 # Evalvid building
 
@@ -20,6 +19,7 @@ WORKDIR /tmp
 RUN rm -rf evalvid-build
 
 # Cleanup
-RUN apt -y purge build-essential libgpac-dev zlib1g-dev libjpeg9-dev libpng-dev
+RUN apt -y purge build-essential libgpac-dev zlib1g-dev libjpeg9-dev libpng-dev gcc patch && apt autoremove && apt autoclean && \
+ rm -rf /var/lib/apt/lists/*
 
 WORKDIR /tmp
